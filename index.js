@@ -30,16 +30,39 @@ const dbConnet = async () => {
     clint.connect();
     console.log("Database conncted successfully");
     //insart user
-    app.post("/api/vi/user", async (req, res) => {
-      const user = req.body;
-      const query = { email: user.email };
-      const existUser = userCollaction.findOne(query);
+    // app.post("/user", async (req, res) => {
+    //   const user = req.body;
+    //   const query = { email: user.email };
+    //   const existUser = userCollaction.findOne(query);
 
-      if (existUser) {
-        return res.send({ message: "user allready exisit" });
+    //   if (existUser) {
+    //     return res.send({ message: "user allready exisit" });
+    //   }
+    //   const result = await userCollaction.insertOne(user);
+    //   res.send(result);
+    // });
+
+    app.post("/user", async (req, res) => {
+      try {
+        const user = req.body;
+        const query = { email: user.email };
+
+        // Check if the user already exists
+        const existUser = await userCollaction.findOne(query);
+
+        if (existUser) {
+          return res.send({
+            message: "User already exists. Proceed to login.",
+          });
+        }
+
+        // Insert the new user into the database
+        const result = await userCollaction.insertOne(user);
+        res.send(result);
+      } catch (error) {
+        console.log(error.name, error.message);
+        res.status(500).send({ error: "An error occurred on the server." });
       }
-      const result = await userCollaction.insertOne(user);
-      res.send(result);
     });
   } catch (error) {
     console.log(error.name, error.message);
