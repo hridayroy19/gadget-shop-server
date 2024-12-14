@@ -7,7 +7,12 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 //middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:5173', 
+    optionsSuccessStatus: 200, 
+  })
+);
 app.use(express.json());
 
 //mongodb
@@ -29,19 +34,16 @@ const dbConnet = async () => {
   try {
     clint.connect();
     console.log("Database conncted successfully");
+
+    //getuser
+    app.get("/user/:email", async( req, res )=>{
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await userCollaction.findOne(query)
+      res.send(user)
+    });
+
     //insart user
-    // app.post("/user", async (req, res) => {
-    //   const user = req.body;
-    //   const query = { email: user.email };
-    //   const existUser = userCollaction.findOne(query);
-
-    //   if (existUser) {
-    //     return res.send({ message: "user allready exisit" });
-    //   }
-    //   const result = await userCollaction.insertOne(user);
-    //   res.send(result);
-    // });
-
     app.post("/user", async (req, res) => {
       try {
         const user = req.body;
