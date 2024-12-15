@@ -36,12 +36,20 @@ const dbConnet = async () => {
     console.log("Database conncted successfully");
 
     //getuser
-    app.get("/user/:email", async( req, res )=>{
-      const email = req.params.email;
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email; 
       const query = { email: email };
-      const user = await userCollaction.findOne(query)
-      res.send(user)
+      console.log(query);
+      
+        const user = await userCollaction.findOne(query);      
+        console.log(user);   
+        if(user === null || user === undefined){
+          res.send('empty')
+        }      
+        res.send(user);
+
     });
+    
 
     //insart user
     app.post("/user", async (req, res) => {
