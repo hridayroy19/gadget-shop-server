@@ -16,7 +16,7 @@ app.use(
 app.use(express.json());
 
 // jwt token validation
-const veryfyJwt = (req, res)=>{
+const veryfyJwt = (req, res, next)=>{
   const authorization = req.header.authorizatioon;
   if(!authorization){
     return res.send({message:'No token'})
@@ -27,8 +27,19 @@ const veryfyJwt = (req, res)=>{
     return res.send({message:'invalid token'})
   }
   req.decode = decode
+  next()
  })
+}
 
+//veryfy seller
+const veryfyseller =async (req,res, next)=>{
+  const email = req.decode.email
+  const query = {email:email}
+  const user = await userCollaction.findOne(query)
+  if(user?.role !== "seller"){
+    return res.send({message:"forbiden access"})
+  }
+  next()
 }
 
 //mongodb
@@ -94,6 +105,16 @@ const dbConnet = async () => {
     console.log(error.name, error.message);
   }
 };
+
+// add product
+app.post("/product", veryfyJwt, veryfyseller, async( req,res)=>{
+  const data = req.body
+  const result = await productCollaction.insertOne(data)
+  res.send(result)
+})
+
+
+
 
 dbConnet();
 
