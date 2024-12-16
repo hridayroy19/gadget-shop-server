@@ -15,6 +15,22 @@ app.use(
 );
 app.use(express.json());
 
+// jwt token validation
+const veryfyJwt = (req, res)=>{
+  const authorization = req.header.authorizatioon;
+  if(!authorization){
+    return res.send({message:'No token'})
+  }
+ const token = authorization.split(' ')[1];
+ jwt.verify(token.process.env.TOKEN_ACCESS,(err, decode)=>{
+  if(err){
+    return res.send({message:'invalid token'})
+  }
+  req.decode = decode
+ })
+
+}
+
 //mongodb
 const url = `mongodb+srv://${process.env.DATABASC_USER}:${process.env.DATABASC_PASS}@cluster0.jg43ilw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
